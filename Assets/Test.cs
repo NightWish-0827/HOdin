@@ -13,4 +13,9 @@ public class Test : MonoBehaviour
     public List<string> TestListString;
     public List<float> TestListFloat;
     public List<bool> TestListBool;
+
+    private void Start()
+    {
+        Debug.Log("Hi");
+    }
 }

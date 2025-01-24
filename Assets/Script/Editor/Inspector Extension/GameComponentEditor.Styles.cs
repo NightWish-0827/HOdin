@@ -5,32 +5,19 @@ public partial class GameComponentEditor
 {
     private GUIStyle GetHeaderStyle(string key)
     {
-        if (!styleCache.TryGetValue(key, out var style))
-        {
-            style = new GUIStyle
-            {
-                normal = { textColor = Color.white },
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleLeft,
-                padding = new RectOffset(10, 10, 5, 5),
-                fontSize = 12,
-                richText = true
-            };
-            styleCache[key] = style;
-        }
-        return style;
+        return GetCachedStyle(key);
     }
 
     private void LoadColor()
     {
-        string colorString = EditorPrefs.GetString(HeaderColorKey, "");
-        if (string.IsNullOrEmpty(colorString))
+        var componentData = GameComponentEditorManager.GetComponentData(target.GetType().FullName);
+        if (componentData != null && !string.IsNullOrEmpty(componentData.colorHtml))
         {
-            headerColor = new Color(0.2f, 0.3f, 0.7f);
+            ColorUtility.TryParseHtmlString(componentData.colorHtml, out headerColor);
         }
         else
         {
-            ColorUtility.TryParseHtmlString(colorString, out headerColor);
+            headerColor = new Color(0.2f, 0.3f, 0.7f); // 기본 색상
         }
     }
 }

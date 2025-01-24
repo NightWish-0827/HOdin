@@ -224,6 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1335170703}
   - component: {fileID: 1335170704}
+  - component: {fileID: 1335170705}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -258,11 +259,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87503c50a681e5146866b9304fdaaec3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestInt: 0
-  TestFloat: 0
-  TestString: 
-  TestBool: 0
-  TestList: 0100000002000000030000000400000005000000
+  TestInt: 123
+  TestFloat: 1.23
+  TestString: "\uC548\uB155\uD558\uC138\uC694 \uD14C\uC2A4\uD2B8\uC785\uB2C8\uB2E4."
+  TestBool: 1
+  TestList: 0000000001000000010000000200000002000000
   TestListString:
   - ee
   - 123123
@@ -272,9 +273,21 @@ MonoBehaviour:
   TestListFloat:
   - 0.15
   - 0.55
-  - 545454.6
-  - 555.5
   TestListBool: 010001
+--- !u!114 &1335170705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1335170701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4713888a604384a88033f409cb8bec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Test1: 0
+  Test2: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

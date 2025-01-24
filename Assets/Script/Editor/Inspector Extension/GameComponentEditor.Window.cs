@@ -23,13 +23,11 @@ public partial class GameComponentEditor
         private GameComponentEditor editor;
         private string propertyName;
         private string headerText;
-        private string targetTypeName;
 
         public void Initialize(GameComponentEditor editor, string propertyName, string currentText)
         {
             this.editor = editor;
             this.propertyName = propertyName;
-            this.targetTypeName = editor.target.GetType().Name;
             this.headerText = currentText;
             this.minSize = new Vector2(300, 100);
             this.maxSize = new Vector2(300, 100);
@@ -42,9 +40,16 @@ public partial class GameComponentEditor
 
             if (GUILayout.Button("저장"))
             {
-                string key = $"{HeaderTextKey}{targetTypeName}_{propertyName}";
-                EditorPrefs.SetString(key, headerText);
-                editor.customHeaderTexts[propertyName] = headerText;
+                if (string.IsNullOrEmpty(headerText))
+                {
+                    editor.customHeaderTexts.Remove(propertyName);
+                }
+                else
+                {
+                    editor.customHeaderTexts[propertyName] = headerText;
+                }
+                
+                editor.SaveSettingsToJson();
                 editor.Repaint();
                 Close();
             }

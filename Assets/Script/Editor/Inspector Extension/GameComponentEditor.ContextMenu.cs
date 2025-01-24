@@ -36,9 +36,8 @@ public partial class GameComponentEditor
         });
         menu.AddItem(new GUIContent("기본값으로 초기화"), false, () =>
         {
-            string key = $"{HeaderTextKey}{target.GetType().Name}_{propertyName}";
-            EditorPrefs.DeleteKey(key);
             customHeaderTexts.Remove(propertyName);
+            SaveSettingsToJson();
             Repaint();
         });
         menu.ShowAsContext();
@@ -58,6 +57,7 @@ public partial class GameComponentEditor
         {
             headerColor = new Color(0.2f, 0.3f, 0.7f);
             EditorPrefs.DeleteKey(HeaderColorKey);
+            SaveSettingsToJson();
             Repaint();
         });
         menu.ShowAsContext();

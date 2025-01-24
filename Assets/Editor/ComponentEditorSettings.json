@@ -1,0 +1,56 @@
+{
+    "components": [
+        {
+            "componentTypeName": "Test",
+            "colorHtml": "#8C4B46FF",
+            "headerEntries": [
+                {
+                    "propertyName": "TestFloat",
+                    "headerText": "테스트 플로트"
+                },
+                {
+                    "propertyName": "TestString",
+                    "headerText": "테스트 스트링"
+                },
+                {
+                    "propertyName": "TestBool",
+                    "headerText": "테스트 불"
+                },
+                {
+                    "propertyName": "TestInt",
+                    "headerText": "테스트 인트"
+                },
+                {
+                    "propertyName": "TestListBool",
+                    "headerText": "테스트 리스트 불"
+                },
+                {
+                    "propertyName": "TestListFloat",
+                    "headerText": "테스트 리스트 플로트"
+                },
+                {
+                    "propertyName": "TestListString",
+                    "headerText": "테스트 리스트 스트링"
+                },
+                {
+                    "propertyName": "TestList",
+                    "headerText": "테스트 리스트"
+                }
+            ]
+        },
+        {
+            "componentTypeName": "TestScript",
+            "colorHtml": "#A5B233FF",
+            "headerEntries": [
+                {
+                    "propertyName": "Test1",
+                    "headerText": "헤더 간격 측정"
+                },
+                {
+                    "propertyName": "Test2",
+                    "headerText": "헤더 중첩 간격 테스트"
+                }
+            ]
+        }
+    ]
+}
