@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 
+[InitializeOnLoad]
 public class TodoListWindow : EditorWindow
 {
     private const float WINDOW_MIN_WIDTH = 400f;
@@ -13,6 +14,39 @@ public class TodoListWindow : EditorWindow
     private string newTaskName = "";
     private string projectName;
     private List<TodoItem> todoItems = new List<TodoItem>();
+
+    private enum TodoListType
+    {
+        [InspectorName("개인")] Personal,
+        [InspectorName("프로젝트")] Team
+    }
+
+    private TodoListType currentListType = TodoListType.Personal;
+
+    private const string TEAM_TODO_PATH = "Assets/Script/Editor/TodoList Extension/TodolistPath";
+    private const string PERSONAL_TODO_FOLDER = "TodoList";
+
+    private const string FIRST_LAUNCH_KEY = "TodoList_FirstLaunch";
+
+    // 세션 체크를 위한 정적 변수
+    private static bool sessionStarted = false;
+
+    static TodoListWindow()
+    {
+        EditorApplication.delayCall += () =>
+        {
+            // 현재 세션에서 아직 실행되지 않았는지 확인
+            if (!sessionStarted && !Application.isPlaying)
+            {
+                var windows = Resources.FindObjectsOfTypeAll<TodoListWindow>();
+                if (windows == null || windows.Length == 0)
+                {
+                    ShowWindow();
+                }
+                sessionStarted = true;
+            }
+        };
+    }
 
     [MenuItem("Tools/Todo List")]
     public static void ShowWindow()
@@ -38,6 +72,7 @@ public class TodoListWindow : EditorWindow
     private void OnEnable()
     {
         projectName = Application.productName;
+        ValidateSavePath(); // 경로 유효성 검사 및 생성
         LoadTodoList();
     }
 
@@ -52,6 +87,15 @@ public class TodoListWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         EditorGUILayout.LabelField($"<color=#59A5F2>{projectName}</color> TODO LIST", titleStyle, GUILayout.ExpandWidth(false));
+        
+        // 타입 선택 토글 추가
+        EditorGUI.BeginChangeCheck();
+        currentListType = (TodoListType)EditorGUILayout.EnumPopup(currentListType, GUILayout.Width(80));
+        if (EditorGUI.EndChangeCheck())
+        {
+            LoadTodoList(); // 타입 변경시 리스트 다시 로드
+        }
+        
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();
 
@@ -203,17 +247,78 @@ public class TodoListWindow : EditorWindow
 
     private string GetSavePath()
     {
-        // 기본 경로 설정
-        string basePath = "Assets/Script/Editor/TodoList Extension/TodolistPath";
+        string basePath;
+        string fileName = currentListType == TodoListType.Personal 
+            ? $"PersonalTodoList_{projectName}.json"
+            : $"TeamTodoList_{projectName}.json";
+        
+        if (currentListType == TodoListType.Personal)
+        {
+            // 개인용은 Unity Temp 폴더 사용
+            basePath = Path.Combine(Application.temporaryCachePath, PERSONAL_TODO_FOLDER);
+        }
+        else
+        {
+            // 협업용은 프로젝트 내부 경로 사용
+            basePath = TEAM_TODO_PATH;
+        }
 
-        // 디렉토리가 없으면 생성
+        // 폴더가 없으면 생성
         if (!Directory.Exists(basePath))
         {
             Directory.CreateDirectory(basePath);
         }
 
-        // 프로젝트별 파일 경로 반환
-        return Path.Combine(basePath, $"TodoList_{projectName}.json");
+        return Path.Combine(basePath, fileName);
+    }
+
+    private void ValidateSavePath()
+    {
+        string basePath = currentListType == TodoListType.Personal 
+            ? Path.Combine(Application.temporaryCachePath, PERSONAL_TODO_FOLDER)
+            : TEAM_TODO_PATH;
+
+        try
+        {
+            // 기본 경로가 없다면 생성
+            if (!Directory.Exists(basePath))
+            {
+                Directory.CreateDirectory(basePath);
+                Debug.Log($"Todo List 폴더 생성됨: {basePath}");
+            }
+
+            // 파일 경로 확인
+            string filePath = GetSavePath();
+            string fileDirectory = Path.GetDirectoryName(filePath);
+            
+            // 파일이 위치할 디렉토리가 없다면 생성
+            if (!Directory.Exists(fileDirectory))
+            {
+                Directory.CreateDirectory(fileDirectory);
+                Debug.Log($"Todo List 하위 폴더 생성됨: {fileDirectory}");
+            }
+
+            // 파일이 없다면 빈 Todo 리스트 생성
+            if (!File.Exists(filePath))
+            {
+                var emptyData = new TodoData { items = new List<TodoItem>() };
+                string jsonData = JsonUtility.ToJson(emptyData, true);
+                File.WriteAllText(filePath, jsonData);
+                Debug.Log($"새 Todo List 파일 생성됨: {filePath}");
+            }
+
+            // 쓰기 권한 테스트
+            string testFile = Path.Combine(fileDirectory, "test.tmp");
+            File.WriteAllText(testFile, "test");
+            File.Delete(testFile);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Todo List 저장 경로 오류: {e.Message}");
+            EditorUtility.DisplayDialog("오류", 
+                "Todo List 저장 경로를 생성할 수 없습니다. 권한을 확인해주세요.", 
+                "확인");
+        }
     }
 }
 
